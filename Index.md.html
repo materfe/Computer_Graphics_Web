@@ -1,0 +1,187 @@
+<meta charset="utf-8">
+
+ <style>
+        /* Header styles */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            color: #444;
+        }
+
+        header p {
+            font-size: 1.2em;
+            color: #666;
+        }
+
+        /* Section titles */
+        h2 {
+            font-size: 1.8em;
+            color: #444;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+
+        /* Description lists */
+        p {
+            margin-bottom: 15px;
+        }
+
+        /* Button styles for downloads */
+        .btn {
+            display: inline-block;
+            margin: 10px 0;
+            padding: 10px 15px;
+            color: #ffffff;
+            background-color: #007BFF;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Footer styles */
+        footer {
+            text-align: center;
+            font-size: 0.9em;
+            color: #888;
+            margin-top: 30px;
+        }
+
+	.issue {
+        color: #d9534f; /* Bootstrap-style red */
+        font-weight: bold;
+    	}
+
+	.video-container {
+        text-align: center; /* Center the video horizontally */
+        margin: 20px 0; /* Add vertical spacing above and below */
+        max-width: 800px; /* Optional: Set a max width to limit size */
+        margin-left: auto; /* Center the container horizontally */
+        margin-right: auto;
+    	}
+
+</style>
+
+
+
+<div class="container">
+    <header>
+        <h1>My Computer Graphic Project Blog</h1>
+        <p>Context</p>
+    </header>
+
+    <p>For the purpose of my school project at the SAE Institute, we have made a **3D scene** made using **OpenGL**. In this scene, there can be found various visual effects made throught shaders written in **GLSL coding language**. Those effects implies **blooming lights**, cube map also known as a **skybox** and as well as the ability to **load .obj and .gltf 3D Models**. To do so was set various **pipelines** using some shaders such as a **vertex and fragment shader**. To work, there has to be a set of OpenGl program and linking it with the chosen shaders.</p>
+
+<p><u>This is an example of a vertex shader made in GLSL :</u></p>
+
+<img src="Images/vertex_shader_example.png" alt="vertex shader example" width="800">
+
+<p><u>This is what the scene looks like (note : the light appears randomly somewhere in the scene):</u></p>
+
+
+<img src="Images/scene.png" alt="scene image" width="800">
+
+
+
+<header>
+    <h2>Global Explication : begin</h2>
+</header>     
+	<p>The Program works with a relatively simple method :</p>
+
+<p>The first step is to prepare the scene and it's parameter meaning **loading all textures** then **setting up all the shaders and pipelines** and finally, preparing the **framebuffers**.
+
+
+<img src="Images/texture_load.png" alt="example of loading a texture" width="800">
+
+<p>As you see, in here we use a simple **namespace** in which we have set a function called <u>LoadTexture</u>. This function uses an external API named **stbi_load.h** that takes care of loading proprely the texture indicated with the path.</p>
+
+<img src="Images/pipeline.png" alt="example of a pipeline" width="800">
+
+<p>This time, an example of a pipeline is shown, it works in **four phases** : loading the shaders, create a program, attaching the shaders to the program and funally, linking the shaders to the program.</p> 
+
+<img src="Images/framebuffer.png" alt="example of a framebuffer" width="800">
+
+<p>A **framebuffer** is the most scary thing to prepare, it needs to be **generated**, **bind** and depending on your utilities, you can add a few attachements such as a **color buffer** that you also have to configure.</p>
+
+
+<img src="Images/tracy_begin.png" alt="tracy profiling" width="800">
+
+<p>As you can witness, the begin part takes it's time, **around 1.5 seconds**. To capture this, we used another external tool named **Tracy** allowing us to **profile** the time each function takes. For this reason, it is way better to do it once at the start rather than making this step each frame.</p>
+
+<header>
+    <h2>Global Explication : main loop</h2>
+</header>     
+	<p>This is the main part of the project :</p>
+
+<p>The main loop is as in it's name, a loop that will redo itself each frame. Since we are using **OpenGL**, we are gonna divide it's work in **passes** and **sub passes**. For our scene, we divided the work in 4 passes : 
+        <ul>
+            <li><b>Shadow pass</b> for shadow calculations.</li>
+            <li><b>G-buffer pass</b> for visual effects such as the **SSAO**.</li>
+            <li><b>Geometry pass</b> to render the scene.</li>
+            <li><b>Light pass</b> to render lights and post process effect like **bloom**.</li>
+        </ul>
+    </p>
+
+<p>Each pass has a special utility and most of them need associated **framebuffers**.
+
+For the **shadow pass**, we will need to make a **depth map** of the different objects present on our scene for the light perspective.</p>
+
+<p><u>Depth map example :</u></p>
+<img src="Images/depth_map.png" alt="depth map" width="800">
+
+<p>The **G-Buffer pass** needs to make a few more "maps". In total, we are gonna have four different maps from this pass : **geometry**, **SSAO**, **blured SSAO** and finally the **ambient occlusion** made from the other four.</p>
+
+<p><u>Geometry (note : this is a map of the object's position) :</u></p>
+<img src="Images/geometry.png" alt="geometry map" width="800">
+
+<p><u>SSAO :</u></p>
+<img src="Images/ssao.png" alt="ssao map" width="800">
+
+<p><u>Blured SSAO :</u></p>
+<img src="Images/SSAO_blur.png" alt="blur SSAO map" width="800">
+
+<p><u>Final ambient occlusion :</u></p>
+<img src="Images/ambient_occlusion.png" alt="ambient occlusion map" width="800">
+
+<p>For the **geometry pass**, there's no need to make any maps but for the lights, there is a need to use at least one **framebuffer** : for the **bloom**</p>
+
+<p><u>Bloom effect (consecutive blur of the light) :</u></p>
+<img src="Images/bloom.png" alt="bloom example" width="800">
+
+<p>All of this, as said before, is a series of effect we repeat **each frame**. Due to this, we can ask ourselves how long does it take and if the scen lag for example. Again, to do so, we can use **Tracy**, the profiling tool.</p>
+
+<p>When we use it, we get such result :</p>
+
+<img src="Images/tracy_pass.png" alt="tracy for passes" width="800">
+
+<p>On this tracy page, we notice a few things : the update takes **20ms** meaning our scene runs at around **50 frames per seconds**. out of those 20ms, **19 are taken for the shadow pass calculation** meaning we could do some heavy optimisation in that domain. Compared to the shadow pass, the **G-buffer** takes a little **800 micro-seconds** and the **Bloom or light pass** takes **151 micro-seconds**. And of course, the rest of the time (around a second) is taken in between those passes to render the scene fully.
+
+<header>
+        <h1>Final conclusion</h1>
+</header>
+
+<p>
+This Project had a lot of different implementations that were really interesting to do. There still are a lot of different visual effects i did not implement that could be intresting to add such as **the PBR lighting**. Overall, it was a relatively good thing to do simply to gather knowledge about the world of making video games. Thank you for reading until the end, I hope this project motivated you to start your own.
+</p>
+
+
+    <a class="btn" href="https://materfe.github.io/physic_engine_web/Final.zip">Download the executables</a>
+
+    <footer>
+        <p>Thank you for visiting!</p>
+        <p><strong>Roux--Da Silva Mathieu</strong> - 02.11.2025</p>
+    </footer>
+</div>
+
+
+
+
+<!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="markdeep.min.js" charset="utf-8"></script><script src="https://morgan3d.github.io/markdeep/latest/markdeep.min.js" charset="utf-8"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
