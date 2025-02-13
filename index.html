@@ -114,7 +114,11 @@
 
 <img src="Images/tracy_begin.png" alt="tracy profiling" width="800">
 
-<p>As you can witness, the begin part takes it's time, **around 1.5 seconds**. To capture this, we used another external tool named **Tracy** allowing us to **profile** the time each function takes. For this reason, it is way better to do it once at the start rather than making this step each frame.</p>
+<p>As you can witness, the begin part takes it's time, **around 1.5 seconds**. To capture this, we used another external tool named **Tracy** allowing us to **profile** the time each function takes. For this reason, it is way better to do it once at the start rather than making this step each frame. We could also see what the other part of our computer does such as the **GPU** like this :</p>
+
+<img src="Images/beginGPU.png" alt="tracy profiling for the GPU" width="800">
+
+<p>For this, we used the **Tracy** option called **TracyGPUContext** and **TracyGPUZone()**.</p>
 
 <header>
     <h2>Global Explication : main loop</h2>
@@ -162,7 +166,9 @@ For the **shadow pass**, we will need to make a **depth map** of the different o
 
 <img src="Images/tracy_pass.png" alt="tracy for passes" width="800">
 
-<p>On this tracy page, we notice a few things : the update takes **20ms** meaning our scene runs at around **50 frames per seconds**. out of those 20ms, **19 are taken for the shadow pass calculation** meaning we could do some heavy optimisation in that domain. Compared to the shadow pass, the **G-buffer** takes a little **800 micro-seconds** and the **Bloom or light pass** takes **151 micro-seconds**. And of course, the rest of the time (around a second) is taken in between those passes to render the scene fully.
+<p>On this tracy page, we notice a few things : the update takes **20ms** meaning our scene runs at around **50 frames per seconds**. out of those 20ms, **19 are taken for the shadow pass calculation** meaning we could do some heavy optimisation in that domain. Compared to the shadow pass, the **G-buffer** takes a little **800 micro-seconds** and the **Bloom or light pass** takes **151 micro-seconds**. And of course, the rest of the time (around a second) is taken in between those passes to render the scene fully. Like earlier, we can also gather some informations about the **GPU** :</p>
+
+<img src="Images/updateGPU.png" alt="tracy GPU for passes" width="800">
 
 <header>
         <h1>Final conclusion</h1>
